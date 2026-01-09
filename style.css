@@ -89,6 +89,75 @@ button {
   background: rgba(255, 255, 255, 0.3);
 }
 
+/* Sekcja ulubionych */
+.favorites-container {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 16px;
+  padding: 15px;
+  margin-bottom: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.favorites-container h3 {
+  font-size: 0.9rem;
+  margin-bottom: 10px;
+  color: rgba(255, 255, 255, 0.6);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.favorites-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.fav-pill {
+  background: rgba(255, 255, 255, 0.1);
+  padding: 6px 15px;
+  border-radius: 20px;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: 0.3s;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.fav-pill:hover {
+  background: rgba(108, 92, 231, 0.4);
+  border-color: #6c5ce7;
+}
+
+/* Przycisk serca na karcie */
+.card-header {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 15px;
+  width: 100%;
+}
+
+.card-header .fav-btn {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  color: rgba(255, 255, 255, 0.3);
+  padding: 0;
+  cursor: pointer;
+  transition: 0.3s;
+  outline: none;
+}
+
+.card-header .fav-btn.active {
+  color: #ff7675;
+  transform: scale(1.2);
+}
+
+.card-header .fav-btn:hover {
+  background: none;
+  transform: scale(1.1);
+  box-shadow: none;
+}
+
 button:hover {
   background: #a29bfe;
   transform: translateY(-2px);
