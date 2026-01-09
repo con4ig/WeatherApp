@@ -1,4 +1,4 @@
-const apiKey = 'API_KEY'; // Tutaj wpisz swój klucz z OpenWeatherMap
+const apiKey = 'cbe6e47d0da20f2b8dc75bbc47af5cbc'; // Tutaj wpisz swój klucz z OpenWeatherMap
 
 const getWeatherBtn = document.getElementById('getWeatherBtn');
 const cityInput = document.getElementById('cityInput');
@@ -10,14 +10,26 @@ const weatherIcon = document.getElementById('weatherIcon');
 const humidity = document.getElementById('humidity');
 const wind = document.getElementById('wind');
 const locationBtn = document.getElementById('locationBtn');
+const favoriteBtn = document.getElementById('favoriteBtn');
+const favoritesList = document.getElementById('favoritesList');
+const favoritesSection = document.getElementById('favoritesSection');
+
+let favorites = JSON.parse(localStorage.getItem('weatherFavorites')) || [];
+
+function updateFavoritesUI() {
+    favoritesSection.classList.toggle('hidden', favorites.length === 0);
+    favoritesList.innerHTML = favorites.map(city =>
+        `<div class="fav-pill" onclick="checkWeather('${city}')">${city}</div>`
+    ).join('');
+}
+
+function updateHeartBtn(city) {
+    favoriteBtn.classList.toggle('active', favorites.includes(city));
+}
 
 async function checkWeather(city, lat, lon) {
     let url;
     if (city) {
-        if (!city) {
-            alert('Podaj nazwę miasta!');
-            return;
-        }
         url = `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${apiKey}&units=metric&lang=pl`;
     } else if (lat && lon) {
         url = `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${apiKey}&units=metric&lang=pl`;
@@ -43,7 +55,8 @@ async function checkWeather(city, lat, lon) {
         const data = await response.json();
 
         // Mapowanie danych do UI
-        cityName.textContent = data.name;
+        const currentCity = data.name;
+        cityName.textContent = currentCity;
         temperature.textContent = `${Math.round(data.main.temp)}°C`;
         description.textContent = data.weather[0].description;
         humidity.textContent = `${data.main.humidity}%`;
@@ -58,16 +71,34 @@ async function checkWeather(city, lat, lon) {
         // Wyczyść input
         cityInput.value = "";
 
+        updateHeartBtn(currentCity);
+
     } catch (error) {
         console.error("Błąd:", error);
         alert('Problem z połączeniem internetowym.');
     }
 }
 
-// Obsługa przycisku
+// Obsługa przycisku wyszukiwania
 getWeatherBtn.addEventListener('click', () => {
     checkWeather(cityInput.value.trim());
 });
+
+// Obsługa serca
+favoriteBtn.addEventListener('click', () => {
+    const city = cityName.textContent;
+    if (favorites.includes(city)) {
+        favorites = favorites.filter(f => f !== city);
+    } else {
+        favorites.push(city);
+    }
+    localStorage.setItem('weatherFavorites', JSON.stringify(favorites));
+    updateHeartBtn(city);
+    updateFavoritesUI();
+});
+
+// Inicjalizacja listy przy starcie
+updateFavoritesUI();
 
 // Obsługa przycisku lokalizacji
 locationBtn.addEventListener('click', () => {
