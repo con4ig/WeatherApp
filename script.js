@@ -1,4 +1,4 @@
-const apiKey = 'API_KEY'; // Tutaj wleisz swój klucz z OpenWeatherMap
+const apiKey = 'API_KEY'; // Tutaj wpisz swój klucz z OpenWeatherMap
 
 const getWeatherBtn = document.getElementById('getWeatherBtn');
 const cityInput = document.getElementById('cityInput');
@@ -9,14 +9,22 @@ const description = document.getElementById('description');
 const weatherIcon = document.getElementById('weatherIcon');
 const humidity = document.getElementById('humidity');
 const wind = document.getElementById('wind');
+const locationBtn = document.getElementById('locationBtn');
 
-async function checkWeather(city) {
-    if (!city) {
-        alert('Podaj nazwę miasta!');
+async function checkWeather(city, lat, lon) {
+    let url;
+    if (city) {
+        if (!city) {
+            alert('Podaj nazwę miasta!');
+            return;
+        }
+        url = `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${apiKey}&units=metric&lang=pl`;
+    } else if (lat && lon) {
+        url = `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${apiKey}&units=metric&lang=pl`;
+    } else {
+        alert('Nie udało się określić lokalizacji.');
         return;
     }
-
-    const url = `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${apiKey}&units=metric&lang=pl`;
 
     try {
         const response = await fetch(url);
@@ -59,6 +67,23 @@ async function checkWeather(city) {
 // Obsługa przycisku
 getWeatherBtn.addEventListener('click', () => {
     checkWeather(cityInput.value.trim());
+});
+
+// Obsługa przycisku lokalizacji
+locationBtn.addEventListener('click', () => {
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+            (position) => {
+                const { latitude, longitude } = position.coords;
+                checkWeather(null, latitude, longitude);
+            },
+            () => {
+                alert('Odmówiono dostępu do lokalizacji lub wystąpił błąd.');
+            }
+        );
+    } else {
+        alert('Twoja przeglądarka nie obsługuje lokalizacji.');
+    }
 });
 
 // Obsługa klawisza Enter
