@@ -10,6 +10,42 @@
 </head>
 
 <body>
+    <div class="container">
+        <div class="search-box">
+            <h1>Pogoda</h1>
+            <div class="input-wrapper">
+                <input type="text" id="cityInput" placeholder="Wpisz miasto..." autocomplete="off" />
+                <button id="getWeatherBtn">Szukaj</button>
+            </div>
+        </div>
+
+        <div id="weatherResult" class="weather-card hidden">
+            <h2 id="cityName">Warszawa</h2>
+            <div class="main-info">
+                <img id="weatherIcon" src="https://openweathermap.org/img/wn/01d@2x.png" alt="Ikona pogody" />
+                <p id="temperature">22°C</p>
+            </div>
+            <p id="description">Czyste niebo</p>
+
+            <div class="details">
+                <div class="col">
+                    <img src="https://img.icons8.com/ios-filled/50/ffffff/water.png" alt="Ikona wilgotności"
+                        width="24" />
+                    <div>
+                        <p id="humidity">45%</p>
+                        <span>Wilgotność</span>
+                    </div>
+                </div>
+                <div class="col">
+                    <img src="https://img.icons8.com/ios-filled/50/ffffff/wind.png" alt="Ikona wiatru" width="24" />
+                    <div>
+                        <p id="wind">12 km/h</p>
+                        <span>Wiatr</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
     <script src="script.js"></script>
 </body>
 
