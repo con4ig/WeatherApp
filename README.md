@@ -1,4 +1,6 @@
-# 🌤️ Modern Weather App
+# 🌤️ Weather App
+
+![Podgląd aplikacji](zdjecie.png)
 
 Prosta, ale elegancka aplikacja pogodowa zbudowana w czystym JavaScript, wykorzystująca dane z **OpenWeatherMap API**. Projekt charakteryzuje się nowoczesnym interfejsem w stylu **Glassmorphism**.
 
