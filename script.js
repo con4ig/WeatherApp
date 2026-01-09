@@ -60,3 +60,10 @@ async function checkWeather(city) {
 getWeatherBtn.addEventListener('click', () => {
     checkWeather(cityInput.value.trim());
 });
+
+// Obsługa klawisza Enter
+cityInput.addEventListener('keydown', (event) => {
+    if (event.key === 'Enter') {
+        checkWeather(cityInput.value.trim());
+    }
+});
