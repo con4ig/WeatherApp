@@ -70,11 +70,23 @@ button {
   background: #6c5ce7;
   color: white;
   border: none;
-  padding: 12px 25px;
+  padding: 12px 20px;
   border-radius: 12px;
   cursor: pointer;
   font-weight: 600;
   transition: 0.3s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#locationBtn {
+  background: rgba(255, 255, 255, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+#locationBtn:hover {
+  background: rgba(255, 255, 255, 0.3);
 }
 
 button:hover {
