@@ -85,3 +85,77 @@ button:hover {
 button:active {
   transform: translateY(0);
 }
+
+/* Rezultat pogodowy */
+.weather-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  transition: 0.5s ease;
+}
+
+.hidden {
+  display: none;
+  opacity: 0;
+}
+
+#cityName {
+  font-size: 2rem;
+  font-weight: 600;
+  margin-bottom: 10px;
+}
+
+.main-info {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin-bottom: 5px;
+}
+
+#temperature {
+  font-size: 3.5rem;
+  font-weight: 300;
+}
+
+#description {
+  font-size: 1.2rem;
+  text-transform: capitalize;
+  color: rgba(255, 255, 255, 0.8);
+  margin-bottom: 25px;
+}
+
+.details {
+  display: flex;
+  justify-content: space-between;
+  width: 80%;
+  margin-top: 20px;
+  padding-top: 20px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.col p {
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+
+.col span {
+  font-size: 0.8rem;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+/* Animacja wejścia */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.weather-card:not(.hidden) {
+  animation: fadeIn 0.6s ease;
+}
