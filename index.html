@@ -22,8 +22,16 @@
             </div>
         </div>
 
+        <div id="favoritesSection" class="favorites-container hidden">
+            <h3>Ulubione:</h3>
+            <div id="favoritesList" class="favorites-list"></div>
+        </div>
+
         <div id="weatherResult" class="weather-card hidden">
-            <h2 id="cityName">Warszawa</h2>
+            <div class="card-header">
+                <h2 id="cityName">Warszawa</h2>
+                <button id="favoriteBtn" class="fav-btn" title="Dodaj do ulubionych">❤</button>
+            </div>
             <div class="main-info">
                 <img id="weatherIcon" src="https://openweathermap.org/img/wn/01d@2x.png" alt="Ikona pogody" />
                 <p id="temperature">22°C</p>
