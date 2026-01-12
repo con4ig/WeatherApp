@@ -9,17 +9,25 @@ export default function App() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
-  const checkWeather = async (cityName) => {
-    if (!cityName) return;
-    
+  const checkWeather = async (cityName, lat, lon) => {
+    let url;
+    if (cityName) {
+      url = `https://api.openweathermap.org/data/2.5/weather?q=${cityName}&appid=${apiKey}&units=metric&lang=pl`;
+    } else if (lat && lon) {
+      url = `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${apiKey}&units=metric&lang=pl`;
+    } else {
+      setError("Nie udało się określić lokalizacji.");
+      return;
+    }
     setLoading(true);
     setError("");
     try {
-      const url = `https://api.openweathermap.org/data/2.5/weather?q=${cityName}&appid=${apiKey}&units=metric&lang=pl`;
       const response = await fetch(url);
       if (!response.ok) {
         if (response.status === 404)
           setError("Nie znaleziono takiego miasta :(");
+        else if (response.status === 401)
+          setError("Błędny klucz API! Sprawdź zmienną apiKey.");
         else setError("Wystąpił błąd podczas pobierania danych.");
         setWeather(null);
         setLoading(false);
@@ -42,6 +50,20 @@ export default function App() {
     setLoading(false);
   };
 
+  const handleLocation = () => {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          const { latitude, longitude } = position.coords;
+          checkWeather(null, latitude, longitude);
+        },
+        () => setError("Odmówiono dostępu do lokalizacji lub wystąpił błąd.")
+      );
+    } else {
+      setError("Twoja przeglądarka nie obsługuje lokalizacji.");
+    }
+  };
+
   const handleInput = (e) => setCity(e.target.value);
   const handleKeyDown = (e) => {
     if (e.key === "Enter") checkWeather(city.trim());
@@ -60,6 +82,17 @@ export default function App() {
             placeholder="Wpisz miasto..."
             autoComplete="off"
           />
+          <button
+            id="locationBtn"
+            title="Użyj mojej lokalizacji"
+            onClick={handleLocation}
+          >
+            <img
+              src="https://img.icons8.com/ios-filled/50/ffffff/marker.png"
+              alt="location"
+              width="20"
+            />
+          </button>
           <button id="getWeatherBtn" onClick={() => checkWeather(city.trim())}>
             Szukaj
           </button>
