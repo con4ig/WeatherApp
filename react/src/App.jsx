@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import "./App.css";
 
 const apiKey = "26fcec2a51d0b21733fbd9e4c84cf799";
@@ -6,8 +6,15 @@ const apiKey = "26fcec2a51d0b21733fbd9e4c84cf799";
 export default function App() {
   const [city, setCity] = useState("");
   const [weather, setWeather] = useState(null);
+  const [favorites, setFavorites] = useState(() => {
+    return JSON.parse(localStorage.getItem("weatherFavorites")) || [];
+  });
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    localStorage.setItem("weatherFavorites", JSON.stringify(favorites));
+  }, [favorites]);
 
   const checkWeather = async (cityName, lat, lon) => {
     let url;
@@ -48,6 +55,19 @@ export default function App() {
       setWeather(null);
     }
     setLoading(false);
+  };
+
+  const handleFavorite = () => {
+    if (!weather) return;
+    if (favorites.includes(weather.city)) {
+      setFavorites(favorites.filter((f) => f !== weather.city));
+    } else {
+      setFavorites([...favorites, weather.city]);
+    }
+  };
+
+  const handleFavoriteClick = (favCity) => {
+    checkWeather(favCity);
   };
 
   const handleLocation = () => {
@@ -99,13 +119,42 @@ export default function App() {
         </div>
       </div>
 
+      {favorites.length > 0 && (
+        <div id="favoritesSection" className="favorites-container">
+          <h3>Ulubione:</h3>
+          <div id="favoritesList" className="favorites-list">
+            {favorites.map((fav) => (
+              <div
+                className="fav-pill"
+                key={fav}
+                onClick={() => handleFavoriteClick(fav)}
+              >
+                {fav}
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
       {error && (
         <div style={{ color: "#ff7675", margin: "10px 0" }}>{error}</div>
       )}
 
       {weather && (
         <div id="weatherResult" className="weather-card">
-          <h2 id="cityName">{weather.city}</h2>
+          <div className="card-header">
+            <h2 id="cityName">{weather.city}</h2>
+            <button
+              id="favoriteBtn"
+              className={`fav-btn${
+                favorites.includes(weather.city) ? " active" : ""
+              }`}
+              title="Dodaj do ulubionych"
+              onClick={handleFavorite}
+            >
+              ❤
+            </button>
+          </div>
           <div className="main-info">
             <img
               id="weatherIcon"
