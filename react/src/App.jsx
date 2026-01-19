@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import "./App.css";
 
-const apiKey = "26fcec2a51d0b21733fbd9e4c84cf799";
+const apiKey = import.meta.env.VITE_OPENWEATHER_API_KEY;
 
 export default function App() {
   const [city, setCity] = useState("");
