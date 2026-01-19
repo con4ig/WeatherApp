@@ -9,12 +9,22 @@ export default function App() {
   const [favorites, setFavorites] = useState(() => {
     return JSON.parse(localStorage.getItem("weatherFavorites")) || [];
   });
-  const [error, setError] = useState("");
+
+  // Stan dla błędu i czy ma być widoczny
+  const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     localStorage.setItem("weatherFavorites", JSON.stringify(favorites));
   }, [favorites]);
+
+  // Funkcja pomocnicza do wyświetlania błędów (znika po 3 sek)
+  const showError = (message) => {
+    setError(message);
+    setTimeout(() => {
+      setError(null);
+    }, 3000);
+  };
 
   const checkWeather = async (cityName, lat, lon) => {
     let url;
@@ -23,19 +33,21 @@ export default function App() {
     } else if (lat && lon) {
       url = `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${apiKey}&units=metric&lang=pl`;
     } else {
-      setError("Nie udało się określić lokalizacji.");
+      showError("Nie udało się określić lokalizacji.");
       return;
     }
+
     setLoading(true);
-    setError("");
+    setError(null); // Czyścimy poprzednie błędy
+
     try {
       const response = await fetch(url);
       if (!response.ok) {
         if (response.status === 404)
-          setError("Nie znaleziono takiego miasta :(");
-        else if (response.status === 401)
-          setError("Błędny klucz API! Sprawdź zmienną apiKey.");
-        else setError("Wystąpił błąd podczas pobierania danych.");
+          showError("Nie znaleziono takiego miasta :(");
+        else if (response.status === 401) showError("Błędny klucz API!");
+        else showError("Wystąpił błąd podczas pobierania danych.");
+
         setWeather(null);
         setLoading(false);
         return;
@@ -51,7 +63,7 @@ export default function App() {
       });
       setCity("");
     } catch (e) {
-      setError("Problem z połączeniem internetowym.");
+      showError("Problem z połączeniem internetowym.");
       setWeather(null);
     }
     setLoading(false);
@@ -77,10 +89,10 @@ export default function App() {
           const { latitude, longitude } = position.coords;
           checkWeather(null, latitude, longitude);
         },
-        () => setError("Odmówiono dostępu do lokalizacji lub wystąpił błąd.")
+        () => showError("Odmówiono dostępu do lokalizacji."),
       );
     } else {
-      setError("Twoja przeglądarka nie obsługuje lokalizacji.");
+      showError("Twoja przeglądarka nie obsługuje lokalizacji.");
     }
   };
 
@@ -91,6 +103,9 @@ export default function App() {
 
   return (
     <div className="container">
+      {/* Sekcja Błędów - teraz wygląda jak profesjonalny alert */}
+      {error && <div className="error-alert">⚠️ {error}</div>}
+
       <div className="search-box">
         <h1>Pogoda</h1>
         <div className="input-wrapper">
@@ -107,11 +122,10 @@ export default function App() {
             title="Użyj mojej lokalizacji"
             onClick={handleLocation}
           >
-            <img
-              src="https://img.icons8.com/ios-filled/50/ffffff/marker.png"
-              alt="location"
-              width="20"
-            />
+            {/* Ikona SVG zamiast zewnętrznego obrazka dla lepszej wydajności */}
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z" />
+            </svg>
           </button>
           <button id="getWeatherBtn" onClick={() => checkWeather(city.trim())}>
             Szukaj
@@ -136,11 +150,9 @@ export default function App() {
         </div>
       )}
 
-      {error && (
-        <div style={{ color: "#ff7675", margin: "10px 0" }}>{error}</div>
-      )}
+      {loading && <div className="loading">Ładowanie danych...</div>}
 
-      {weather && (
+      {weather && !loading && (
         <div id="weatherResult" className="weather-card">
           <div className="card-header">
             <h2 id="cityName">{weather.city}</h2>
@@ -163,25 +175,21 @@ export default function App() {
             />
             <p id="temperature">{weather.temp}°C</p>
           </div>
-          <p id="description">{weather.desc}</p>
+          <p id="description">
+            {/* Capitalize first letter - mały JS trick dla estetyki */}
+            {weather.desc.charAt(0).toUpperCase() + weather.desc.slice(1)}
+          </p>
           <div className="details">
             <div className="col">
-              <img
-                src="https://img.icons8.com/ios-filled/50/ffffff/water.png"
-                alt="Ikona wilgotności"
-                width="24"
-              />
+              {/* Proste ikony tekstowe lub SVG są bezpieczniejsze niż linki */}
+              <span style={{ fontSize: "24px" }}>💧</span>
               <div>
                 <p id="humidity">{weather.humidity}%</p>
                 <span>Wilgotność</span>
               </div>
             </div>
             <div className="col">
-              <img
-                src="https://img.icons8.com/ios-filled/50/ffffff/wind.png"
-                alt="Ikona wiatru"
-                width="24"
-              />
+              <span style={{ fontSize: "24px" }}>💨</span>
               <div>
                 <p id="wind">{weather.wind} km/h</p>
                 <span>Wiatr</span>
@@ -190,7 +198,20 @@ export default function App() {
           </div>
         </div>
       )}
-      {loading && <div style={{ margin: "10px 0" }}>Ładowanie...</div>}
+
+      {/* Nowa sekcja licencji */}
+      <footer className="footer-license">
+        <p>
+          Dane pogodowe dostarcza{" "}
+          <a
+            href="https://openweathermap.org/"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            OpenWeather
+          </a>
+        </p>
+      </footer>
     </div>
   );
 }
