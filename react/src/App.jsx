@@ -104,7 +104,14 @@ export default function App() {
   return (
     <div className="container">
       {/* Sekcja Błędów - teraz wygląda jak profesjonalny alert */}
-      {error && <div className="error-alert">⚠️ {error}</div>}
+      {error && (
+        <div className="error-container">
+          <div className="error-alert">
+            <span className="error-icon">⚠️</span>
+            <p>{error}</p>
+          </div>
+        </div>
+      )}
 
       <div className="search-box">
         <h1>Pogoda</h1>

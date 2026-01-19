@@ -262,3 +262,43 @@ button:active {
   color: #a29bfe;
   text-decoration: underline;
 }
+
+/* Nowy komunikat błędu */
+.error-container {
+  position: fixed;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1000;
+  animation: slideDown 0.4s ease-out;
+}
+
+.error-alert {
+  background: rgba(255, 95, 95, 0.15);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 95, 95, 0.3);
+  padding: 12px 24px;
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  box-shadow: 0 8px 32px 0 rgba(255, 95, 95, 0.2);
+  color: #ff9f9f;
+  font-weight: 500;
+}
+
+.error-icon {
+  font-size: 1.2rem;
+}
+
+@keyframes slideDown {
+  from {
+    top: -50px;
+    opacity: 0;
+  }
+  to {
+    top: 20px;
+    opacity: 1;
+  }
+}
