@@ -204,86 +204,90 @@ export default function App() {
 
       {weather && !loading && (
         <div id="weatherResult" className="weather-card">
-          <div className="card-header">
-            <h2 id="cityName">{weather.city}</h2>
-            <button
-              id="favoriteBtn"
-              className={`fav-btn${
-                favorites.includes(weather.city) ? " active" : ""
-              }`}
-              title="Dodaj do ulubionych"
-              onClick={handleFavorite}
-            >
-              ❤
-            </button>
+          <div className="result-main">
+            <div className="card-header">
+              <h2 id="cityName">{weather.city}</h2>
+              <button
+                id="favoriteBtn"
+                className={`fav-btn${
+                  favorites.includes(weather.city) ? " active" : ""
+                }`}
+                title="Dodaj do ulubionych"
+                onClick={handleFavorite}
+              >
+                ❤
+              </button>
+            </div>
+            <div className="main-info">
+              <img
+                id="weatherIcon"
+                src={`https://openweathermap.org/img/wn/${weather.icon}@4x.png`}
+                alt="Ikona pogody"
+              />
+              <p id="temperature">{weather.temp}°C</p>
+            </div>
+            <p id="description">
+              {weather.desc.charAt(0).toUpperCase() + weather.desc.slice(1)}
+            </p>
           </div>
-          <div className="main-info">
-            <img
-              id="weatherIcon"
-              src={`https://openweathermap.org/img/wn/${weather.icon}@2x.png`}
-              alt="Ikona pogody"
-            />
-            <p id="temperature">{weather.temp}°C</p>
-          </div>
-          <p id="description">
-            {/* Capitalize first letter - mały JS trick dla estetyki */}
-            {weather.desc.charAt(0).toUpperCase() + weather.desc.slice(1)}
-          </p>
-          <div className="details-grid">
-            <div className="detail-tile">
-              <span className="detail-icon">🌡️</span>
-              <div className="detail-info">
-                <p>{weather.feelsLike}°C</p>
-                <span>Odczuwalna</span>
+
+          <div className="result-details">
+            <div className="details-grid">
+              <div className="detail-tile">
+                <span className="detail-icon">🌡️</span>
+                <div className="detail-info">
+                  <p>{weather.feelsLike}°C</p>
+                  <span>Odczuwalna</span>
+                </div>
               </div>
-            </div>
-            <div className="detail-tile">
-              <span className="detail-icon">💧</span>
-              <div className="detail-info">
-                <p>{weather.humidity}%</p>
-                <span>Wilgotność</span>
+              <div className="detail-tile">
+                <span className="detail-icon">💧</span>
+                <div className="detail-info">
+                  <p>{weather.humidity}%</p>
+                  <span>Wilgotność</span>
+                </div>
               </div>
-            </div>
-            <div className="detail-tile">
-              <span className="detail-icon">💨</span>
-              <div className="detail-info">
-                <p>{weather.wind} km/h</p>
-                <span>Wiatr</span>
+              <div className="detail-tile">
+                <span className="detail-icon">💨</span>
+                <div className="detail-info">
+                  <p>{weather.wind} km/h</p>
+                  <span>Wiatr</span>
+                </div>
               </div>
-            </div>
-            <div className="detail-tile">
-              <span className="detail-icon">⏲️</span>
-              <div className="detail-info">
-                <p>{weather.pressure} hPa</p>
-                <span>Ciśnienie</span>
+              <div className="detail-tile">
+                <span className="detail-icon">⏲️</span>
+                <div className="detail-info">
+                  <p>{weather.pressure} hPa</p>
+                  <span>Ciśnienie</span>
+                </div>
               </div>
-            </div>
-            <div className="detail-tile">
-              <span className="detail-icon">👁️</span>
-              <div className="detail-info">
-                <p>{weather.visibility} km</p>
-                <span>Widoczność</span>
+              <div className="detail-tile">
+                <span className="detail-icon">👁️</span>
+                <div className="detail-info">
+                  <p>{weather.visibility} km</p>
+                  <span>Widoczność</span>
+                </div>
               </div>
-            </div>
-            <div className="detail-tile">
-              <span className="detail-icon">☀️</span>
-              <div className="detail-info">
-                <p>{weather.sunrise}</p>
-                <span>Wschód słońca</span>
+              <div className="detail-tile">
+                <span className="detail-icon">☀️</span>
+                <div className="detail-info">
+                  <p>{weather.sunrise}</p>
+                  <span>Wschód słońca</span>
+                </div>
               </div>
-            </div>
-            <div className="detail-tile">
-              <span className="detail-icon">🔽</span>
-              <div className="detail-info">
-                <p>{weather.tempMin}°C</p>
-                <span>Temp. Min.</span>
+              <div className="detail-tile">
+                <span className="detail-icon">🔽</span>
+                <div className="detail-info">
+                  <p>{weather.tempMin}°C</p>
+                  <span>Min. Temp</span>
+                </div>
               </div>
-            </div>
-            <div className="detail-tile">
-              <span className="detail-icon">🔼</span>
-              <div className="detail-info">
-                <p>{weather.tempMax}°C</p>
-                <span>Temp. Max.</span>
+              <div className="detail-tile">
+                <span className="detail-icon">🔼</span>
+                <div className="detail-info">
+                  <p>{weather.tempMax}°C</p>
+                  <span>Max. Temp</span>
+                </div>
               </div>
             </div>
           </div>

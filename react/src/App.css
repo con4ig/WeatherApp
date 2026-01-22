@@ -12,30 +12,31 @@ body {
   justify-content: center;
   align-items: center;
   color: white;
+  padding: 20px;
 }
 
 .container {
-  width: 90%;
-  max-width: 650px;
+  width: 100%;
+  max-width: 1000px;
 }
 
-/* Szklana karta */
-.search-box,
-.weather-card {
-  background: rgba(255, 255, 255, 0.1);
-  backdrop-filter: blur(15px);
-  border: 1px solid rgba(255, 255, 255, 0.2);
+/* Glassmorphism Refined */
+.search-box {
+  background: rgba(255, 255, 255, 0.03);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 24px;
-  padding: 40px;
-  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
-  margin-bottom: 20px;
+  padding: 30px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+  margin-bottom: 25px;
   text-align: center;
 }
 
 h1 {
-  font-weight: 600;
+  font-weight: 700;
   margin-bottom: 25px;
-  letter-spacing: 1px;
+  letter-spacing: -0.5px;
+  font-size: 1.8rem;
 }
 
 .input-wrapper {
@@ -43,227 +44,250 @@ h1 {
   justify-content: center;
   align-items: center;
   gap: 12px;
+  max-width: 600px;
+  margin: 0 auto;
 }
 
 input {
   flex: 1;
-  background: rgba(255, 255, 255, 0.1);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  padding: 12px 20px;
-  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 14px 20px;
+  border-radius: 14px;
   color: white;
   outline: none;
   font-size: 16px;
-  transition: 0.3s;
-}
-
-input::placeholder {
-  color: rgba(255, 255, 255, 0.5);
+  transition: all 0.3s ease;
 }
 
 input:focus {
-  background: rgba(255, 255, 255, 0.2);
-  border-color: rgba(255, 255, 255, 0.5);
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(108, 92, 231, 0.5);
 }
 
 button {
   background: #6c5ce7;
   color: white;
   border: none;
-  padding: 12px 20px;
-  border-radius: 12px;
+  padding: 14px 22px;
+  border-radius: 14px;
   cursor: pointer;
   font-weight: 600;
-  transition: 0.3s;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
+button:hover {
+  background: #5b48d9;
+  transform: translateY(-2px);
+}
+
 #locationBtn {
-  background: rgba(255, 255, 255, 0.15);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-}
-
-#locationBtn:hover {
-  background: rgba(255, 255, 255, 0.3);
-}
-
-/* Sekcja ulubionych */
-.favorites-container {
-  background: rgba(255, 255, 255, 0.05);
-  border-radius: 16px;
-  padding: 25px;
-  margin-bottom: 20px;
+  background: rgba(255, 255, 255, 0.08);
   border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-.favorites-container h3 {
-  font-size: 0.9rem;
-  margin-bottom: 10px;
-  color: rgba(255, 255, 255, 0.6);
+/* Dashboard Layout */
+.weather-card {
+  background: rgba(15, 15, 25, 0.4);
+  backdrop-filter: blur(30px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 32px;
+  padding: 40px 50px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+  display: flex;
+  gap: 60px;
+  animation: fadeIn 0.8s ease;
+}
+
+.result-main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  border-right: 1px solid rgba(255, 255, 255, 0.08);
+  padding-right: 50px;
+}
+
+.result-details {
+  flex: 2;
+  padding-left: 10px;
+}
+
+/* Main Weather Styles */
+#cityName {
+  font-size: 2.8rem;
+  font-weight: 800;
+  margin-bottom: 5px;
+  background: linear-gradient(to bottom, #fff, #aaa);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.card-header {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.fav-btn {
+  background: none !important;
+  font-size: 1.8rem;
+  padding: 0;
+  box-shadow: none !important;
+  color: rgba(255, 255, 255, 0.2);
+}
+
+.fav-btn.active {
+  color: #ff7675;
+}
+
+.main-info {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  margin: 15px 0;
+}
+
+.main-info img {
+  width: 140px;
+  height: 140px;
+  margin-left: -25px;
+  filter: drop-shadow(0 10px 20px rgba(0, 0, 0, 0.3));
+}
+
+#temperature {
+  font-size: 5.5rem;
+  font-weight: 200;
+  letter-spacing: -4px;
+}
+
+#description {
+  font-size: 1.5rem;
+  color: rgba(255, 255, 255, 0.5);
+  font-weight: 300;
+  text-transform: capitalize;
+}
+
+/* Grid Styles */
+.details-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 15px;
+}
+
+.detail-tile {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 20px;
+  padding: 20px;
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  transition: 0.3s;
+}
+
+.detail-tile:hover {
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(255, 255, 255, 0.15);
+  transform: translateY(-3px);
+}
+
+.detail-icon {
+  font-size: 1.6rem;
+}
+
+.detail-info p {
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+
+.detail-info span {
+  font-size: 0.65rem;
+  color: rgba(255, 255, 255, 0.4);
   text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+/* Favorites Section */
+.favorites-container {
+  background: rgba(255, 255, 255, 0.02);
+  border-radius: 18px;
+  padding: 20px;
+  margin-bottom: 25px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.favorites-container h3 {
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.4);
+  margin-bottom: 12px;
   letter-spacing: 1px;
 }
 
 .favorites-list {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px;
+  gap: 10px;
 }
 
 .fav-pill {
-  background: rgba(255, 255, 255, 0.1);
-  padding: 6px 15px;
-  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  padding: 8px 18px;
+  border-radius: 12px;
   font-size: 0.9rem;
   cursor: pointer;
   transition: 0.3s;
-  border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .fav-pill:hover {
-  background: rgba(108, 92, 231, 0.4);
-  border-color: #6c5ce7;
+  background: #6c5ce7;
+  border-color: transparent;
 }
 
-/* Przycisk serca na karcie */
-.card-header {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 15px;
-  width: 100%;
-}
-
-.card-header .fav-btn {
-  background: none;
-  border: none;
-  font-size: 1.5rem;
-  color: rgba(255, 255, 255, 0.3);
-  padding: 0;
-  cursor: pointer;
-  transition: 0.3s;
-  outline: none;
-}
-
-.card-header .fav-btn.active {
-  color: #ff7675;
-  transform: scale(1.2);
-}
-
-.card-header .fav-btn:hover {
-  background: none;
-  transform: scale(1.1);
-  box-shadow: none;
-}
-
-button:hover {
-  background: #a29bfe;
-  transform: translateY(-2px);
-}
-
-button:active {
-  transform: translateY(0);
-}
-
-/* Rezultat pogodowy */
-.weather-card {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  transition: 0.5s ease;
-}
-
-.hidden {
-  display: none;
-  opacity: 0;
-}
-
-#cityName {
-  font-size: 2rem;
-  font-weight: 600;
-  margin-bottom: 10px;
-}
-
-.main-info {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 10px;
-  margin-bottom: 5px;
-}
-
-#temperature {
-  font-size: 3.5rem;
-  font-weight: 300;
-}
-
-#description {
-  font-size: 1.2rem;
-  text-transform: capitalize;
-  color: rgba(255, 255, 255, 0.8);
-  margin-bottom: 25px;
-}
-
-.details-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 15px;
-  width: 100%;
-  margin-top: 30px;
-}
-
-.detail-tile {
-  background: rgba(255, 255, 255, 0.05);
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 20px;
-  padding: 15px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  transition: all 0.3s ease;
-  cursor: default;
-}
-
-.detail-tile:hover {
-  background: rgba(255, 255, 255, 0.1);
-  transform: translateY(-5px);
-  border-color: rgba(255, 255, 255, 0.3);
-  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
-}
-
-.detail-icon {
-  font-size: 24px;
-}
-
-.detail-info {
-  text-align: center;
-}
-
-.detail-info p {
-  font-size: 1.1rem;
-  font-weight: 600;
-  margin: 0;
-}
-
-.detail-info span {
-  font-size: 0.75rem;
-  color: rgba(255, 255, 255, 0.5);
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-}
-
-@media (max-width: 400px) {
-  .details-grid {
-    grid-template-columns: 1fr;
+/* Mobile Responsiveness */
+@media (max-width: 850px) {
+  .weather-card {
+    flex-direction: column;
+    padding: 30px;
+    gap: 30px;
+  }
+  .result-main {
+    border-right: none;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    padding-right: 0;
+    padding-bottom: 30px;
+    align-items: center;
+    text-align: center;
+  }
+  .card-header {
+    justify-content: center;
+  }
+  .main-info {
+    justify-content: center;
+  }
+  .main-info img {
+    margin-left: 0;
   }
 }
 
-/* Animacja wejścia */
+@media (max-width: 480px) {
+  .details-grid {
+    grid-template-columns: 1fr;
+  }
+  #temperature {
+    font-size: 4rem;
+  }
+  #cityName {
+    font-size: 2rem;
+  }
+}
+
 @keyframes fadeIn {
   from {
     opacity: 0;
@@ -275,68 +299,35 @@ button:active {
   }
 }
 
-.weather-card:not(.hidden) {
-  animation: fadeIn 0.6s ease;
-}
-
-/* Stylizacja stopki z licencją */
+/* Footer & Errors */
 .footer-license {
   margin-top: 30px;
-  padding-top: 20px;
-  border-top: 1px solid rgba(255, 255, 255, 0.1);
   text-align: center;
-  font-size: 0.85rem;
-  color: rgba(255, 255, 255, 0.5);
+  font-size: 0.8rem;
+  color: rgba(255, 255, 255, 0.3);
 }
 
 .footer-license a {
   color: #6c5ce7;
   text-decoration: none;
-  font-weight: 600;
-  transition: 0.3s;
 }
 
-.footer-license a:hover {
-  color: #a29bfe;
-  text-decoration: underline;
-}
-
-/* Nowy komunikat błędu */
 .error-container {
   position: fixed;
   top: 20px;
   left: 50%;
   transform: translateX(-50%);
   z-index: 1000;
-  animation: slideDown 0.4s ease-out;
 }
 
 .error-alert {
   background: rgba(255, 95, 95, 0.15);
   backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
   border: 1px solid rgba(255, 95, 95, 0.3);
   padding: 12px 24px;
   border-radius: 16px;
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  box-shadow: 0 8px 32px 0 rgba(255, 95, 95, 0.2);
   color: #ff9f9f;
-  font-weight: 500;
-}
-
-.error-icon {
-  font-size: 1.2rem;
-}
-
-@keyframes slideDown {
-  from {
-    top: -50px;
-    opacity: 0;
-  }
-  to {
-    top: 20px;
-    opacity: 1;
-  }
+  display: flex;
+  gap: 12px;
+  align-items: center;
 }
