@@ -3,6 +3,23 @@ import "./App.css";
 
 const apiKey = import.meta.env.VITE_OPENWEATHER_API_KEY;
 
+// Hook do debouncingu wartości
+function useDebounce(value, delay) {
+  const [debouncedValue, setDebouncedValue] = useState(value);
+
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedValue(value);
+    }, delay);
+
+    return () => {
+      clearTimeout(handler);
+    };
+  }, [value, delay]);
+
+  return debouncedValue;
+}
+
 export default function App() {
   const [city, setCity] = useState("");
   const [weather, setWeather] = useState(null);
@@ -14,9 +31,19 @@ export default function App() {
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
 
+  // Debounce dla wyszukiwania (500ms)
+  const debouncedCity = useDebounce(city, 600);
+
   useEffect(() => {
     localStorage.setItem("weatherFavorites", JSON.stringify(favorites));
   }, [favorites]);
+
+  // Automatyczne wyszukiwanie gdy wartość debounced się zmieni
+  useEffect(() => {
+    if (debouncedCity.trim().length >= 3) {
+      checkWeather(debouncedCity.trim());
+    }
+  }, [debouncedCity]);
 
   // Funkcja pomocnicza do wyświetlania błędów (znika po 3 sek)
   const showError = (message) => {
@@ -56,10 +83,23 @@ export default function App() {
       setWeather({
         city: data.name,
         temp: Math.round(data.main.temp),
+        tempMin: Math.round(data.main.temp_min),
+        tempMax: Math.round(data.main.temp_max),
+        feelsLike: Math.round(data.main.feels_like),
         desc: data.weather[0].description,
         icon: data.weather[0].icon,
         humidity: data.main.humidity,
+        pressure: data.main.pressure,
+        visibility: data.visibility / 1000,
         wind: Math.round(data.wind.speed * 3.6),
+        sunrise: new Date(data.sys.sunrise * 1000).toLocaleTimeString("pl-PL", {
+          hour: "2-digit",
+          minute: "2-digit",
+        }),
+        sunset: new Date(data.sys.sunset * 1000).toLocaleTimeString("pl-PL", {
+          hour: "2-digit",
+          minute: "2-digit",
+        }),
       });
       setCity("");
     } catch (e) {
@@ -96,7 +136,10 @@ export default function App() {
     }
   };
 
-  const handleInput = (e) => setCity(e.target.value);
+  const handleInput = (e) => {
+    setCity(e.target.value);
+    if (error) setError(null); // Czyścimy błąd gdy użytkownik zaczyna pisać
+  };
   const handleKeyDown = (e) => {
     if (e.key === "Enter") checkWeather(city.trim());
   };
@@ -186,20 +229,61 @@ export default function App() {
             {/* Capitalize first letter - mały JS trick dla estetyki */}
             {weather.desc.charAt(0).toUpperCase() + weather.desc.slice(1)}
           </p>
-          <div className="details">
-            <div className="col">
-              {/* Proste ikony tekstowe lub SVG są bezpieczniejsze niż linki */}
-              <span style={{ fontSize: "24px" }}>💧</span>
-              <div>
-                <p id="humidity">{weather.humidity}%</p>
+          <div className="details-grid">
+            <div className="detail-tile">
+              <span className="detail-icon">🌡️</span>
+              <div className="detail-info">
+                <p>{weather.feelsLike}°C</p>
+                <span>Odczuwalna</span>
+              </div>
+            </div>
+            <div className="detail-tile">
+              <span className="detail-icon">💧</span>
+              <div className="detail-info">
+                <p>{weather.humidity}%</p>
                 <span>Wilgotność</span>
               </div>
             </div>
-            <div className="col">
-              <span style={{ fontSize: "24px" }}>💨</span>
-              <div>
-                <p id="wind">{weather.wind} km/h</p>
+            <div className="detail-tile">
+              <span className="detail-icon">💨</span>
+              <div className="detail-info">
+                <p>{weather.wind} km/h</p>
                 <span>Wiatr</span>
+              </div>
+            </div>
+            <div className="detail-tile">
+              <span className="detail-icon">⏲️</span>
+              <div className="detail-info">
+                <p>{weather.pressure} hPa</p>
+                <span>Ciśnienie</span>
+              </div>
+            </div>
+            <div className="detail-tile">
+              <span className="detail-icon">👁️</span>
+              <div className="detail-info">
+                <p>{weather.visibility} km</p>
+                <span>Widoczność</span>
+              </div>
+            </div>
+            <div className="detail-tile">
+              <span className="detail-icon">☀️</span>
+              <div className="detail-info">
+                <p>{weather.sunrise}</p>
+                <span>Wschód słońca</span>
+              </div>
+            </div>
+            <div className="detail-tile">
+              <span className="detail-icon">🔽</span>
+              <div className="detail-info">
+                <p>{weather.tempMin}°C</p>
+                <span>Temp. Min.</span>
+              </div>
+            </div>
+            <div className="detail-tile">
+              <span className="detail-icon">🔼</span>
+              <div className="detail-info">
+                <p>{weather.tempMax}°C</p>
+                <span>Temp. Max.</span>
               </div>
             </div>
           </div>
