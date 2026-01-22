@@ -1,38 +1,54 @@
-# 🌤️ Weather App
+# 🌤️ Weather Dashboard - React
 
 ![Podgląd aplikacji](zdjecie.png)
 
-Prosta, ale elegancka aplikacja pogodowa zbudowana w czystym JavaScript, wykorzystująca dane z **OpenWeatherMap API**. Projekt charakteryzuje się nowoczesnym interfejsem w stylu **Glassmorphism**.
+Nowoczesna, responsywna aplikacja pogodowa zbudowana w **React**, wykorzystująca dane z **OpenWeatherMap API**. Projekt został zaprojektowany z myślą o elegancji i intuicyjności, korzystając z zaawansowanych technik **Glassmorphism**.
 
-## 🚀 Funkcje
+**🚀 Zobacz wersję demo:** [https://weatherappszymon.netlify.app/](https://weatherappszymon.netlify.app/)
 
-- **Pobieranie danych w czasie rzeczywistym**: Informacje o pogodzie dla dowolnego miasta na świecie.
-- **Rozszerzone informacje**: Wyświetla temperaturę, opis pogody, wilgotność oraz prędkość wiatru.
-- **Interaktywny UI**:
-  - Nowoczesny efekt "szklanej karty" (glassmorphism).
-  - Płynne animacje pojawiania się wyników.
-  - Obsługa wyszukiwania za pomocą klawisza **Enter**.
-- **Responsive Design**: Aplikacja dobrze wygląda zarówno na komputerach, jak i urządzeniach mobilnych.
+## ✨ Funkcje
+
+- **Inteligentne auto-wyszukiwanie**: Dzięki zastosowaniu **Debouncera**, aplikacja automatycznie pobiera dane po zakończeniu wpisywania przez użytkownika (brak konieczności klikania przycisku).
+- **Premium Weather Dashboard**: Przejrzysty układ dwukolumnowy na desktopie, dzielący główne informacje od szczegółowych statystyk.
+- **Szczegółowe kafelki (Tiles)**: 8 interaktywnych kart z informacjami takimi jak:
+  - Temperatura odczuwalna
+  - Wilgotność i ciśnienie
+  - Prędkość wiatru i widoczność
+  - Godzina wschodu słońca
+  - Zakres temperatur (Min/Max)
+- **Ulubione lokalizacje**: Możliwość zapisywania miast do listy ulubionych (zapis w `localStorage`).
+- **Responsive Design**: Pełne wsparcie dla urządzeń mobilnych i tabletów.
 
 ## 🛠️ Technologie
 
-- **HTML5**
-- **CSS3 (Vanilla)**
-- **JavaScript (ES6+)**
-- **Google Fonts**: Wykorzystanie nowoczesnego fontu "Outfit".
+- **React 19** (Vite)
+- **CSS3 (Vanilla)** z efektami Glassmorphism
+- **OpenWeatherMap API**
+- **Lucide React / Emoji Icons**
+- **Google Fonts** (Outfit)
 
 ## 📦 Instalacja i uruchomienie
 
-1. Sklonuj repozytorium:
+Aplikacja znajduje się w katalogu `/react`.
+
+1. Przejdź do folderu z aplikacją:
    ```bash
-   git clone https://github.com/con4ig/WeatherApp.git
+   cd react
    ```
-2. Otwórz plik `index.html` w swojej przeglądarce.
-
-## 🔑 Konfiguracja API
-
-Aplikacja wymaga klucza API z serwisu [OpenWeatherMap](https://openweathermap.org/api). Klucz należy umieścić w pliku `script.js` w zmiennej `apiKey`.
+2. Zainstaluj zależności:
+   ```bash
+   npm install
+   ```
+3. Skonfiguruj klucz API:
+   Utwórz plik `.env` w folderze `react` i dodaj:
+   ```env
+   VITE_OPENWEATHER_API_KEY=twoj_klucz_api
+   ```
+4. Uruchom projekt:
+   ```bash
+   npm run dev
+   ```
 
 ---
 
-_Projekt wykonany na zadanie szkolne._
+_Projekt wykonany przez Szymona Wire na zadanie szkolne z programowania._
