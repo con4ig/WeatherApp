@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import "./App.css";
+import RainBackground from "./RainBackground";
 
 const apiKey = import.meta.env.VITE_OPENWEATHER_API_KEY;
 
@@ -146,6 +147,7 @@ export default function App() {
 
   return (
     <div className="container">
+      <RainBackground />
       {/* Sekcja Błędów - teraz wygląda jak profesjonalny alert */}
       {error && (
         <div className="error-container">
