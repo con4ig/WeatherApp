@@ -1,6 +1,6 @@
 # 🌤️ Weather Dashboard - React
 
-![Podgląd aplikacji](zdjecie.png)
+![Podgląd aplikacji](zdjecie.png?v=1)
 
 Nowoczesna, responsywna aplikacja pogodowa zbudowana w **React**, wykorzystująca dane z **OpenWeatherMap API**. Projekt został zaprojektowany z myślą o elegancji i intuicyjności, korzystając z zaawansowanych technik **Glassmorphism**.
 
