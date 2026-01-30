@@ -1,88 +1,89 @@
 import React, { useState, useEffect } from "react";
 import "./App.css";
-import RainBackground from "./RainBackground";
+import MountainBackground from "./MountainBackground";
+import {
+  AreaChart,
+  Area,
+  XAxis,
+  YAxis,
+  Tooltip,
+  ResponsiveContainer,
+} from "recharts";
 
 const apiKey = import.meta.env.VITE_OPENWEATHER_API_KEY;
 
-// Hook do debouncingu wartości
 function useDebounce(value, delay) {
   const [debouncedValue, setDebouncedValue] = useState(value);
-
   useEffect(() => {
-    const handler = setTimeout(() => {
-      setDebouncedValue(value);
-    }, delay);
-
-    return () => {
-      clearTimeout(handler);
-    };
+    const handler = setTimeout(() => setDebouncedValue(value), delay);
+    return () => clearTimeout(handler);
   }, [value, delay]);
-
   return debouncedValue;
 }
+
+const CustomTooltip = ({ active, payload, label }) => {
+  if (active && payload && payload.length) {
+    return (
+      <div className="custom-tooltip">
+        <p className="label">{`${label}`}</p>
+        <p className="intro">{`${payload[0].value}°C`}</p>
+      </div>
+    );
+  }
+  return null;
+};
 
 export default function App() {
   const [city, setCity] = useState("");
   const [weather, setWeather] = useState(null);
-  const [favorites, setFavorites] = useState(() => {
-    return JSON.parse(localStorage.getItem("weatherFavorites")) || [];
-  });
-
-  // Stan dla błędu i czy ma być widoczny
+  const [forecast, setForecast] = useState([]);
+  const [favorites, setFavorites] = useState(
+    () => JSON.parse(localStorage.getItem("weatherFavorites")) || [],
+  );
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
 
-  // Debounce dla wyszukiwania (500ms)
   const debouncedCity = useDebounce(city, 600);
 
   useEffect(() => {
     localStorage.setItem("weatherFavorites", JSON.stringify(favorites));
   }, [favorites]);
 
-  // Automatyczne wyszukiwanie gdy wartość debounced się zmieni
   useEffect(() => {
     if (debouncedCity.trim().length >= 3) {
       checkWeather(debouncedCity.trim());
     }
   }, [debouncedCity]);
 
-  // Funkcja pomocnicza do wyświetlania błędów (znika po 3 sek)
   const showError = (message) => {
     setError(message);
-    setTimeout(() => {
-      setError(null);
-    }, 3000);
+    setTimeout(() => setError(null), 3000);
   };
 
   const checkWeather = async (cityName, lat, lon) => {
-    let url;
+    let weatherUrl, forecastUrl;
+    const baseParams = `appid=${apiKey}&units=metric&lang=pl`;
+
     if (cityName) {
-      url = `https://api.openweathermap.org/data/2.5/weather?q=${cityName}&appid=${apiKey}&units=metric&lang=pl`;
+      weatherUrl = `https://api.openweathermap.org/data/2.5/weather?q=${cityName}&${baseParams}`;
+      forecastUrl = `https://api.openweathermap.org/data/2.5/forecast?q=${cityName}&${baseParams}`;
     } else if (lat && lon) {
-      url = `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${apiKey}&units=metric&lang=pl`;
-    } else {
-      showError("Nie udało się określić lokalizacji.");
-      return;
-    }
+      weatherUrl = `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&${baseParams}`;
+      forecastUrl = `https://api.openweathermap.org/data/2.5/forecast?lat=${lat}&lon=${lon}&${baseParams}`;
+    } else return;
 
     setLoading(true);
-    setError(null); // Czyścimy poprzednie błędy
+    setError(null);
 
     try {
-      const response = await fetch(url);
-      if (!response.ok) {
-        if (response.status === 404)
-          showError("Nie znaleziono takiego miasta :(");
-        else if (response.status === 401) showError("Błędny klucz API!");
-        else showError("Wystąpił błąd podczas pobierania danych.");
+      // 1. Fetch Current Weather (Critical)
+      const resWeather = await fetch(weatherUrl);
+      if (!resWeather.ok) throw new Error("City not found");
+      const data = await resWeather.json();
 
-        setWeather(null);
-        setLoading(false);
-        return;
-      }
-      const data = await response.json();
       setWeather({
         city: data.name,
+        country: data.sys.country,
         temp: Math.round(data.main.temp),
         tempMin: Math.round(data.main.temp_min),
         tempMax: Math.round(data.main.temp_max),
@@ -91,7 +92,7 @@ export default function App() {
         icon: data.weather[0].icon,
         humidity: data.main.humidity,
         pressure: data.main.pressure,
-        visibility: data.visibility / 1000,
+        visibility: (data.visibility / 1000).toFixed(1),
         wind: Math.round(data.wind.speed * 3.6),
         sunrise: new Date(data.sys.sunrise * 1000).toLocaleTimeString("pl-PL", {
           hour: "2-digit",
@@ -103,8 +104,31 @@ export default function App() {
         }),
       });
       setCity("");
+
+      // 2. Fetch Forecast (Optional) - separate try/catch to not block main UI
+      try {
+        const resForecast = await fetch(forecastUrl);
+        if (resForecast.ok) {
+          const forecastData = await resForecast.json();
+          const chartData = forecastData.list.slice(0, 9).map((item) => ({
+            time: new Date(item.dt * 1000).toLocaleTimeString("pl-PL", {
+              hour: "2-digit",
+              hour12: false,
+            }),
+            temp: Math.round(item.main.temp),
+          }));
+          setForecast(chartData);
+        } else {
+          console.warn("Forecast API failed");
+          setForecast([]);
+        }
+      } catch (forecastErr) {
+        console.warn("Forecast fetch error:", forecastErr);
+        setForecast([]);
+      }
     } catch (e) {
-      showError("Problem z połączeniem internetowym.");
+      console.error(e);
+      showError("Nie znaleziono miasta lub błąd sieci.");
       setWeather(null);
     }
     setLoading(false);
@@ -112,203 +136,192 @@ export default function App() {
 
   const handleFavorite = () => {
     if (!weather) return;
-    if (favorites.includes(weather.city)) {
+    if (favorites.includes(weather.city))
       setFavorites(favorites.filter((f) => f !== weather.city));
-    } else {
-      setFavorites([...favorites, weather.city]);
-    }
+    else setFavorites([...favorites, weather.city]);
   };
 
-  const handleFavoriteClick = (favCity) => {
-    checkWeather(favCity);
-  };
-
-  const handleLocation = () => {
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
-        (position) => {
-          const { latitude, longitude } = position.coords;
-          checkWeather(null, latitude, longitude);
-        },
-        () => showError("Odmówiono dostępu do lokalizacji."),
-      );
-    } else {
-      showError("Twoja przeglądarka nie obsługuje lokalizacji.");
-    }
-  };
-
-  const handleInput = (e) => {
-    setCity(e.target.value);
-    if (error) setError(null); // Czyścimy błąd gdy użytkownik zaczyna pisać
-  };
-  const handleKeyDown = (e) => {
-    if (e.key === "Enter") checkWeather(city.trim());
-  };
+  const currentDate = new Date().toLocaleDateString("pl-PL", {
+    weekday: "long",
+    month: "long",
+    day: "numeric",
+  });
 
   return (
-    <div className="container">
-      <RainBackground />
-      {/* Sekcja Błędów - teraz wygląda jak profesjonalny alert */}
-      {error && (
-        <div className="error-container">
-          <div className="error-alert">
-            <span className="error-icon">⚠️</span>
-            <p>{error}</p>
-          </div>
-        </div>
-      )}
+    <div className="app-container">
+      <MountainBackground />
 
-      <div className="search-box">
-        <h1>Pogoda</h1>
-        <div className="input-wrapper">
+      <header className="app-header">
+        <div className="location-info">
+          {weather ? (
+            <>
+              <div className="location-row">
+                <span className="location-icon">📍</span>
+                <span className="location-text">
+                  {weather.city}, {weather.country}
+                </span>
+              </div>
+              <div className="date-text">{currentDate}</div>
+            </>
+          ) : (
+            <div className="location-row">
+              <span className="location-text">Pogoda</span>
+            </div>
+          )}
+        </div>
+
+        {/* Desktop Search Bar */}
+        <div className="desktop-search">
           <input
             type="text"
             value={city}
-            onChange={handleInput}
-            onKeyDown={handleKeyDown}
-            placeholder="Wpisz miasto..."
-            autoComplete="off"
+            onChange={(e) => setCity(e.target.value)}
+            onKeyDown={(e) => e.key === "Enter" && checkWeather(city.trim())}
+            placeholder="Szukaj miasta..."
           />
-          <button
-            id="locationBtn"
-            title="Użyj mojej lokalizacji"
-            onClick={handleLocation}
+          <button onClick={() => checkWeather(city.trim())}>🔍</button>
+        </div>
+        <button
+          className="menu-btn"
+          onClick={() =>
+            document.getElementById("search-modal").classList.toggle("active")
+          }
+        >
+          <svg
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
           >
-            {/* Ikona SVG zamiast zewnętrznego obrazka dla lepszej wydajności */}
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z" />
-            </svg>
-          </button>
-          <button id="getWeatherBtn" onClick={() => checkWeather(city.trim())}>
-            Szukaj
+            <line x1="3" y1="12" x2="21" y2="12"></line>
+            <line x1="3" y1="6" x2="21" y2="6"></line>
+            <line x1="3" y1="18" x2="21" y2="18"></line>
+          </svg>
+        </button>
+      </header>
+
+      <div
+        id="search-modal"
+        className={`search-overlay ${!weather ? "active" : ""}`}
+      >
+        <div className="search-content">
+          <h2>Znajdź lokalizację</h2>
+          <div className="input-group">
+            <input
+              type="text"
+              value={city}
+              onChange={(e) => setCity(e.target.value)}
+              onKeyDown={(e) => e.key === "Enter" && checkWeather(city.trim())}
+              placeholder="Szukaj miasta..."
+            />
+            <button onClick={() => checkWeather(city.trim())}>🔍</button>
+          </div>
+          {favorites.length > 0 && (
+            <div className="favorites-grid">
+              {favorites.map((fav) => (
+                <div
+                  key={fav}
+                  className="fav-item"
+                  onClick={() => checkWeather(fav)}
+                >
+                  {fav}
+                </div>
+              ))}
+            </div>
+          )}
+          <button
+            className="close-search"
+            onClick={() =>
+              document.getElementById("search-modal").classList.remove("active")
+            }
+          >
+            Zamknij
           </button>
         </div>
       </div>
 
-      {favorites.length > 0 && (
-        <div id="favoritesSection" className="favorites-container">
-          <h3>Ulubione:</h3>
-          <div id="favoritesList" className="favorites-list">
-            {favorites.map((fav) => (
-              <div
-                className="fav-pill"
-                key={fav}
-                onClick={() => handleFavoriteClick(fav)}
-              >
-                {fav}
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
+      {weather && (
+        <div className="dashboard-grid">
+          {/* Left Column: Hero */}
+          <div className="hero-section">
+            <div className="temperature-display">{weather.temp}</div>
 
-      {loading && <div className="loading">Ładowanie danych...</div>}
-
-      {weather && !loading && (
-        <div id="weatherResult" className="weather-card">
-          <div className="result-main">
-            <div className="card-header">
-              <h2 id="cityName">{weather.city}</h2>
-              <button
-                id="favoriteBtn"
-                className={`fav-btn${
-                  favorites.includes(weather.city) ? " active" : ""
-                }`}
-                title="Dodaj do ulubionych"
-                onClick={handleFavorite}
-              >
-                ❤
-              </button>
+            <div className="hero-pills">
+              <div className="glass-pill">{weather.desc}</div>
+              <div className="glass-pill icon-pill">📈</div>
             </div>
-            <div className="main-info">
-              <img
-                id="weatherIcon"
-                src={`https://openweathermap.org/img/wn/${weather.icon}@4x.png`}
-                alt="Ikona pogody"
-              />
-              <p id="temperature">{weather.temp}°C</p>
-            </div>
-            <p id="description">
-              {weather.desc.charAt(0).toUpperCase() + weather.desc.slice(1)}
-            </p>
           </div>
 
-          <div className="result-details">
-            <div className="details-grid">
-              <div className="detail-tile">
-                <span className="detail-icon">🌡️</span>
-                <div className="detail-info">
-                  <p>{weather.feelsLike}°C</p>
-                  <span>Odczuwalna</span>
-                </div>
-              </div>
-              <div className="detail-tile">
-                <span className="detail-icon">💧</span>
-                <div className="detail-info">
-                  <p>{weather.humidity}%</p>
-                  <span>Wilgotność</span>
-                </div>
-              </div>
-              <div className="detail-tile">
-                <span className="detail-icon">💨</span>
-                <div className="detail-info">
-                  <p>{weather.wind} km/h</p>
+          {/* Right Column: Details */}
+          <div className="details-section">
+            <div className="glass-card-container">
+              <div className="glass-card">
+                <div className="card-item">
+                  <div className="icon-circle">💨</div>
                   <span>Wiatr</span>
+                  <p>{weather.wind} km/h</p>
                 </div>
-              </div>
-              <div className="detail-tile">
-                <span className="detail-icon">⏲️</span>
-                <div className="detail-info">
-                  <p>{weather.pressure} hPa</p>
-                  <span>Ciśnienie</span>
+                <div className="card-item">
+                  <div className="icon-circle">💧</div>
+                  <span>Wilgotność</span>
+                  <p>{weather.humidity}%</p>
                 </div>
-              </div>
-              <div className="detail-tile">
-                <span className="detail-icon">👁️</span>
-                <div className="detail-info">
-                  <p>{weather.visibility} km</p>
+                <div className="card-item">
+                  <div className="icon-circle">👁️</div>
                   <span>Widoczność</span>
+                  <p>{weather.visibility} km</p>
                 </div>
-              </div>
-              <div className="detail-tile">
-                <span className="detail-icon">☀️</span>
-                <div className="detail-info">
-                  <p>{weather.sunrise}</p>
-                  <span>Wschód słońca</span>
-                </div>
-              </div>
-              <div className="detail-tile">
-                <span className="detail-icon">🔽</span>
-                <div className="detail-info">
-                  <p>{weather.tempMin}°C</p>
-                  <span>Min. Temp</span>
-                </div>
-              </div>
-              <div className="detail-tile">
-                <span className="detail-icon">🔼</span>
-                <div className="detail-info">
-                  <p>{weather.tempMax}°C</p>
-                  <span>Max. Temp</span>
+                <div className="card-item">
+                  <div className="icon-circle">⏲️</div>
+                  <span>Ciśnienie</span>
+                  <p>{weather.pressure} hPa</p>
                 </div>
               </div>
             </div>
           </div>
+
+          <div className="chart-section">
+            <h3 className="chart-title">Prognoza 24h</h3>
+            <div className="chart-container-glass">
+              <ResponsiveContainer width="100%" height={150}>
+                <AreaChart data={forecast}>
+                  <defs>
+                    <linearGradient id="colorTemp" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="#8884d8" stopOpacity={0.8} />
+                      <stop offset="95%" stopColor="#8884d8" stopOpacity={0} />
+                    </linearGradient>
+                  </defs>
+                  <XAxis
+                    dataKey="time"
+                    tick={{ fill: "rgba(255,255,255,0.5)", fontSize: 12 }}
+                    stroke="rgba(255,255,255,0.1)"
+                  />
+                  <Tooltip content={<CustomTooltip />} />
+                  <Area
+                    type="monotone"
+                    dataKey="temp"
+                    stroke="#8884d8"
+                    fillOpacity={1}
+                    fill="url(#colorTemp)"
+                  />
+                </AreaChart>
+              </ResponsiveContainer>
+            </div>
+          </div>
+
+          <button
+            className={`fab-fav ${favorites.includes(weather.city) ? "active" : ""}`}
+            onClick={handleFavorite}
+          >
+            ❤
+          </button>
         </div>
       )}
 
-      {/* Nowa sekcja licencji */}
-      <footer className="footer-license">
-        <p>
-          Dane pogodowe dostarcza{" "}
-          <a
-            href="https://openweathermap.org/"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            OpenWeather
-          </a>
-        </p>
-      </footer>
+      {error && <div className="error-toast">{error}</div>}
+      {loading && <div className="loading-spinner"></div>}
     </div>
   );
 }
